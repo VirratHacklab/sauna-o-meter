@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="theme-color" content="#000000">
+
+        <link rel="stylesheet" href="https://use.typekit.net/edc3cql.css">
+        <title>Sauna O Meter</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: sans-serif;
+                overflow: hidden;
+            }
+
+            .sauna-o-meter,
+            .telemetry-background,
+            .telemetry-gauge {
+                position: absolute;
+                width: 800px;
+                height: 480px;
+                overflow: hidden;
+            }
+            .telemetry-background {
+                background-image: url(file:///usr/src/app/images/vihta.JPG);
+                background-repeat: no-repeat;
+                background-size: cover;
+                filter: brightness(30%);
+            }
+            .telemetry-gauge {
+                background-image: url(file:///usr/src/app/images/temperature.png);
+                background-position: -200px 16px;
+                background-repeat: no-repeat;
+                background-size: 80%;
+            }
+
+            .telemetry-container {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 196px;
+                padding-right: 16px;
+                display: flex;
+                justify-content: space-between;
+            }
+            .telemetry-data {
+                margin: 16px;
+                color: #fafafa;
+            }
+            .definition,
+            .term {
+                margin: 0 0 0 20px;
+            }
+            .definition {
+                font-size: 36px;
+            }
+            .term {
+                font-size: 90px;
+            }
+        </style>
+    </head>
+    <body>
+        <noscript>
+            You need to enable JavaScript to run this app.
+        </noscript>
+        <div class="sauna-o-meter">
+            <div class="telemetry-background"></div>
+            <div class="telemetry-gauge"></div>
+            <div class="telemetry-container">
+                <section class="section temperature">
+                    <dl class="telemetry-data">
+                        <dd class="definition tk-abolition">Temperature</dd>
+                        <dt class="term tk-abolition"><span id="temperature-value">...</span> °C</dt>
+                    </dl>
+                </section>
+                <section class="section humidity">
+                    <dl class="telemetry-data">
+                        <dd class="definition tk-abolition">Humidity</dd>
+                        <dt class="term tk-abolition"><span id="humidity-value">...</span> %</dt>
+                    </dl>
+                </section>
+                <section class="section air-pressure">
+                    <dl class="telemetry-data">
+                        <dd class="definition tk-abolition">Air pressure</dd>
+                        <dt class="term tk-abolition"><span id="air-pressure-value">...</span> hPa</dt>
+                    </dl>
+                </section>
+            </div>
+        </div>
+        <script>
+            (function(window, document) {
+                const { ipcRenderer } = require('electron');
+                const temperatureElement = document.getElementById('temperature-value');
+                const humidityElement = document.getElementById('humidity-value');
+                const airPressureElement = document.getElementById('air-pressure-value');
+                ipcRenderer.send('initialize');
+                ipcRenderer.on('telemetry-data', (event, payload) => {
+                    temperatureElement.innerText = parseFloat(payload.data.temperature).toFixed(2).toString();
+                    humidityElement.innerText = parseInt(payload.data.humidity, 10).toString();
+                    airPressureElement.innerText = parseFloat(payload.data.pressure).toFixed(2).toString();
+                });
+            }(window, window.document))
+        </script>
+    </body>
+</html>
